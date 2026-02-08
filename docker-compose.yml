@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/<DEINUSER>/feuerwehr-tool:latest
+    image: ghcr.io/baca89/feuerwehr-tool:latest
     container_name: feuerwehr_app
     depends_on:
       - db
