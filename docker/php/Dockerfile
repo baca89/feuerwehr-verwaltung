@@ -1,17 +1,15 @@
 FROM php:8.3-fpm
 
-# System libs
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip libpng-dev libonig-dev libxml2-dev
+    git curl zip unzip libpng-dev libonig-dev libxml2-dev \
+    && docker-php-ext-install pdo_mysql mbstring bcmath gd fileinfo
 
-# PHP Extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
-
-# Composer installieren
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Node.js für Vite/Tailwind
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
-
 WORKDIR /var/www
+
+COPY ./src /var/www
+
+RUN composer install --no-dev --optimize-autoloader
+RUN php artisan config:cache
+RUN php artisan route:cache
