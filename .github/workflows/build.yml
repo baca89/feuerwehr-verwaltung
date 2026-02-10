@@ -23,6 +23,8 @@ jobs:
       # 3️⃣ Install GitVersion
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.14
+        with:
+          versionSpec: '5.x' # oder spezifische Version, z.B. '5.8.0'
 
       # 4️⃣ Ermittele FullSemVer
       - name: Determine Version
