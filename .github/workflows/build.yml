@@ -25,6 +25,7 @@ jobs:
         uses: gittools/actions/gitversion/setup@v0.9.14
         with:
           versionSpec: '5.x' # oder spezifische Version, z.B. '5.8.0'
+          useGlobalTool: true
 
       # 4️⃣ Ermittele FullSemVer
       - name: Determine Version
