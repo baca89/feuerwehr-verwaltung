@@ -3,39 +3,17 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [ "master" ]
-  workflow_dispatch: # optional: manuell triggern
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout Repo
+      # 1️⃣ Repo auschecken
       - name: Checkout Repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # notwendig für GitVersion Tags
 
-      # 2️⃣ Erstelle .env aus Secret
-      - name: Create .env from Secret
-        run: echo "${{ secrets.ENV_FILE }}" > ./src/.env
-
-      # 3️⃣ Install GitVersion
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.14
-        with:
-          versionSpec: '5.x' # oder spezifische Version, z.B. '5.8.0'
-
-      # 4️⃣ Ermittele FullSemVer
-      - name: Determine Version
-        id: gitversion
-        run: |
-          git fetch --tags
-          VERSION=$(dotnet-gitversion /showvariable FullSemVer)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-
-      # 5️⃣ Login zu GHCR
+      # 2️⃣ GitHub Container Registry Login
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -43,13 +21,28 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
 
-      # 6️⃣ Docker Build + Tag
+      # 3️⃣ GitVersion installieren
+      - name: Setup GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.14
+        with:
+          versionSpec: '5.13.x'
+
+      # 4️⃣ Version ermitteln (Major.Minor.Patch)
+      - name: Determine Version
+        id: gitversion
+        run: |
+          git fetch --tags
+          VERSION=$(dotnet-gitversion /showvariable SemVer)  # nur Major.Minor.Patch
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      # 5️⃣ Docker Image bauen & taggen
       - name: Build Docker Image
         run: |
+          echo "Building Docker image version ${{ steps.gitversion.outputs.version }}"
           docker build -t ghcr.io/${{ github.repository }}:${{ steps.gitversion.outputs.version }} -f docker/php/Dockerfile ./src
           docker tag ghcr.io/${{ github.repository }}:${{ steps.gitversion.outputs.version }} ghcr.io/${{ github.repository }}:latest
 
-      # 7️⃣ Push Docker Image
+      # 6️⃣ Docker Image pushen
       - name: Push Docker Image
         run: |
           docker push ghcr.io/${{ github.repository }}:${{ steps.gitversion.outputs.version }}
