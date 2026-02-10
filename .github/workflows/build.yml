@@ -25,7 +25,7 @@ jobs:
       - name: Setup GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.14
         with:
-          versionSpec: '5.13.x'
+          versionSpec: '5.x'  # GitVersion 5.x installieren
 
       # 4️⃣ Version ermitteln (Major.Minor.Patch)
       - name: Determine Version
