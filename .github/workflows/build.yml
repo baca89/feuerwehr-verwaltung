@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "Building Docker image version ${{ steps.gitversion.outputs.version }}"
           echo "${{ secrets.ENV_FILE }}" > .env
-          docker build -t ghcr.io/${{ github.repository }}:${{ steps.gitversion.outputs.version }} -f docker/php/Dockerfile ./src
+          docker build -t ghcr.io/${{ github.repository }}:${{ steps.gitversion.outputs.version }} -f docker/php/Dockerfile .
           docker tag ghcr.io/${{ github.repository }}:${{ steps.gitversion.outputs.version }} ghcr.io/${{ github.repository }}:latest
 
       # 6️⃣ Docker Image pushen
