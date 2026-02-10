@@ -12,6 +12,9 @@ jobs:
       # 1️⃣ Repo auschecken
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Holt die komplette Git-History
+
 
       # 2️⃣ GitHub Container Registry Login
       - name: Login to GitHub Container Registry
@@ -32,7 +35,7 @@ jobs:
         id: gitversion
         run: |
           git fetch --tags
-          VERSION=$(dotnet-gitversion /showvariable SemVer)  # nur Major.Minor.Patch
+          VERSION=$(dotnet-gitversion /showvariable SemVer)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       # 5️⃣ Docker Image bauen & taggen
